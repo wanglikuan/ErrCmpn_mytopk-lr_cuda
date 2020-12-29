@@ -64,6 +64,12 @@ args = parser.parse_args()
 
 # select top-k gradient changes
 def get_upload_topk(g_remain, g_new, ratio, isCompensate, dev):
+    g_remain_copy = []
+    for idx, g_layer in enumerate(g_remain):
+        g_layer_tmp = torch.zeros_like(g_layer).cuda(dev)
+        g_layer_tmp += g_layer
+        g_remain_copy.append(g_layer_tmp)
+
     for idx, g_layer in enumerate(g_new):
         g_remain[idx] = g_layer - g_remain[idx]
 
@@ -86,7 +92,7 @@ def get_upload_topk(g_remain, g_new, ratio, isCompensate, dev):
         mask = g_layer >= threshold
         g_upload_layer = torch.zeros_like(g_layer).cuda(dev)
         g_upload_layer[mask] += g_remain[idx][mask]
-        g_remain[idx] = g_new[idx] + g_upload_layer
+        g_remain[idx] = g_remain_copy[idx] + g_upload_layer
         g_upload.append(g_upload_layer)
 
     return g_remain, g_upload
@@ -333,6 +339,8 @@ def run(workers, models, save_path, train_data_list, test_data, iterations_epoch
         + args.title \
         + '_' + args.method \
         + '_' + args.model \
+        + '_lr' + str(args.lr)\
+        + '_bsz' + str(args.train_bsz)\
         + '_B' + str(args.byzantine) \
         + '_V' + str(int(args.V)) \
         + '_E' + str(args.loops) \
@@ -642,9 +650,9 @@ if __name__ == '__main__':
             model = vgg.vgg11()
 
             train_transform, test_transform = get_data_transform('cifar')
-            train_dataset = datasets.CIFAR100(args.data_dir, train=True, download=False,
+            train_dataset = datasets.CIFAR10(args.data_dir, train=True, download=True,
                                              transform=train_transform)
-            test_dataset = datasets.CIFAR100(args.data_dir, train=False, download=False,
+            test_dataset = datasets.CIFAR10(args.data_dir, train=False, download=True,
                                             transform=test_transform)
         else:
             print('Model must be {} or {}!'.format('MnistCNN', 'AlexNet'))

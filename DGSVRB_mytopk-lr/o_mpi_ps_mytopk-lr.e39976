@@ -1,0 +1,15 @@
+Process Process-1:
+Traceback (most recent call last):
+  File "/ubda/home/hzhaowang/.conda/envs/py_gpu/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/ubda/home/hzhaowang/.conda/envs/py_gpu/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "LearnerSimulation.py", line 567, in init_processes
+    fn(workers, models, save_path, train_dataset_list, test_dataset, iterations_epoch)
+  File "LearnerSimulation.py", line 433, in run
+    g_remain, g_large_change = get_upload_topk(g_remain_list[i - 1], new_g_avg, args.ratio, args.isCompensate, dev)
+  File "LearnerSimulation.py", line 87, in get_upload_topk
+    top_k = torch.topk(g_remain_abs_vector, k)
+RuntimeError: merge_sort: failed to synchronize: an illegal memory access was encountered
+WARNING: $PATH does not agree with $PATH_modshare counter. The following directories' usage counters were adjusted to match. Note that this may mean that module unloading may not work correctly.
+ /ubda/apps/anaconda/anaconda3-5.2.0/bin
